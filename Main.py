@@ -1,7 +1,9 @@
+import math
 import tkinter as tk  # python 3
 from tkinter import font as tkfont, messagebox  # python 3
 from PIL import ImageTk
 from PIL import Image
+from array import *
 
 object_id = None
 
@@ -77,16 +79,21 @@ class Rules(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="A complete text game, the program will let users move through rooms based on\n "
-                                    "user input and get descriptions of each room. To create this, you’ll need to\n "
-                                    "establish the directions in which the user can move, a way to track how far the\n "
-                                    "user has moved (and therefore which room he/she is in), and to print out a\n "
-                                    "description. You’ll also need to set limits for how far the user can move. In\n "
-                                    "other words, create “walls” around the rooms that tell the user,\n "
-                                    "“You can’t move further in this direction.”", font=controller.title_font)
+        label = tk.Label(self, text="Hey champ!! this is a game where you can compete with your friends to know how\n "
+                                    "much distance you have covered only in 2 minute!! Yes, there are no hardcore\n "
+                                    "rules You will be represented by the orange circle and you have to move the\n "
+                                    "circle in inside the white frame to cover the vast distance as soon as "
+                                    "possible.\n "
+                                    "Hint=[Try to click on opposite corners to cover the most of the distance,\n "
+                                    "this will increase your total score. The distance is getting calculated in\n "
+                                    "backend and will be shown on console in the end.] \n All the best!!!",
+                         font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="GET SET GO!!!",
                            command=lambda: controller.show_frame("Game"), fg="GREEN")
+
+        btn_delete = tk.Button(self, text='QUIT', width=15, command=delete, fg="RED")
+        btn_delete.pack()
         button.pack()
 
 
@@ -95,23 +102,34 @@ class Game(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        x1 = []
+        y1 = []
+        distance = []
 
         def click(event):
-
-            if object_id is not None:
+            if object_id:
                 coord = can.coords(object_id)
                 width = coord[2] - coord[0]
                 height = coord[3] - coord[1]
 
                 can.coords(object_id, event.x, event.y, event.x + width, event.y + height)
+                print("x: ", event.x, "y: ", event.y)
+                if x1:
+                    distance.append(math.sqrt(((x1[-1] - event.x) ** 2) + ((y1[-1] - event.y) ** 2)))
+                    print('last distance jump', distance[-1])
+                    print('total distance', sum(distance))
+                x1.append(event.x)
+                y1.append(event.y)
+                # print(x1)
+                # print(y1)
 
         def create_circle():
-
             global object_id
 
             object_id = can.create_oval(10, 10, 70, 70, fill='orange', outline='black')
+            app.after(20000, lambda: app.destroy())
 
-        can = tk.Canvas(self, bg='white', height=550, width=550)
+        can = tk.Canvas(self, bg='white', height=650, width=650)
         can.pack(side=tk.RIGHT)
         can.bind("<Button-1>", click)
 
